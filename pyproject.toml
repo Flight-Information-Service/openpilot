@@ -40,7 +40,7 @@ dependencies = [
   "websocket_client",
 
   # joystickd
-  "inputs",
+  "pygame",
 
   # these should be removed
   "pyzmq",
