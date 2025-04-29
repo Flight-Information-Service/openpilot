@@ -1629,6 +1629,27 @@
     ],
     "package": "Highway Driving Assist"
   },
+  "Kia EV6 (without HDA II) 2025": {
+    "platform": "KIA_EV6_2025",
+    "make": "Kia",
+    "brand": "hyundai",
+    "model": "EV6 (without HDA II)",
+    "year": [
+      "2025"
+    ],
+    "package": "Highway Driving Assist"
+  },
+  "Kia EV9 (with HDA II)": {
+    "platform": "KIA_EV9",
+    "make": "Kia",
+    "brand": "hyundai",
+    "model": "EV9 (with HDA II)",
+    "year": [
+      "2024",
+      "2025"
+    ],
+    "package": "Highway Driving Assist II"
+  },
   "Kia Forte 2019-21": {
     "platform": "KIA_FORTE",
     "make": "Kia",
