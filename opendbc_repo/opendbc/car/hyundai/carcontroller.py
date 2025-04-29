@@ -153,7 +153,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD:
-      can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_torque, set_speed_in_units, 
+      can_sends.extend(self.create_canfd_msgs(apply_steer_req, self.apply_angle_now, apply_torque, set_speed_in_units, 
                                               accel, stopping, hud_control, CS, CC))
     else:
       can_sends.extend(self.create_can_msgs(apply_steer_req, apply_torque, torque_fault, set_speed_in_units, accel,
@@ -213,14 +213,14 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     return can_sends
 
-  def create_canfd_msgs(self, apply_steer_req, apply_torque, set_speed_in_units, accel, stopping, hud_control, CS, CC):
+  def create_canfd_msgs(self, apply_steer_req, apply_angle, apply_torque, set_speed_in_units, accel, stopping, hud_control, CS, CC):
     can_sends = []
 
     lka_steering = self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING
     lka_steering_long = lka_steering and self.CP.openpilotLongitudinalControl
 
     # steering control
-    can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, CC.latActive, apply_torque, 
+    can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, CC.latActive, apply_angle, apply_torque, 
                                                            self.lkas_icon, self.lkas_max_torque, self.is_angle_control))
 
     # prevent LFA from activating on LKA steering cars by sending "no lane lines detected" to ADAS ECU
