@@ -63,6 +63,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     self.apply_angle_now = 0
     self.apply_angle_last = 0
+    self.apply_steer_last = 0
     self.max_steering_angle = 90
     self.max_driver_angle_wait = 0.002
     self.max_steer_angle_wait = 0.001
