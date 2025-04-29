@@ -1,5 +1,6 @@
 # functions common among cars
 import numpy as np
+from collections import namedtuple
 from dataclasses import dataclass, field
 from enum import IntFlag, ReprEnum, StrEnum, EnumType, auto
 from dataclasses import replace
