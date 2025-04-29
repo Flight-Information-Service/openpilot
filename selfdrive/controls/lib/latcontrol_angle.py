@@ -12,7 +12,13 @@ class LatControlAngle(LatControl):
   def __init__(self, CP, CP_SP, CI):
     super().__init__(CP, CP_SP, CI)
     self.sat_check_min_speed = 5.
-    
+
+    self.torque_params = CP.lateralTuning.torque.as_builder()
+    self.pid = PIDController(self.torque_params.kp, self.torque_params.ki,
+                             k_f=self.torque_params.kf, pos_limit=self.steer_max, neg_limit=-self.steer_max)
+    self.torque_from_lateral_accel = CI.torque_from_lateral_accel()
+    self.use_steering_angle = self.torque_params.useSteeringAngle
+    self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
     self.extension = LatControlTorqueExt(self, CP, CP_SP)
 
   def update(self, active, CS, VM, params, steer_limited_by_controls, desired_curvature, calibrated_pose, curvature_limited):
