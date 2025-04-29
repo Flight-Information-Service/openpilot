@@ -70,12 +70,14 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     self.driver_angle_wait = 0.001
     self.lkas_max_torque = 0
     self.driver_steering_angle_above_timer = 150
+
+    self.is_angle_control = False
     
     self.steer_timer_apply_torque = 1.0
     self.DT_STEER = 0.005  # 0.01 1sec, 0.005  2sec
 
   def update(self, CC, CC_SP, CS, now_nanos):
-    is_angle_control = self.CP.carFingerprint in ANGLE_CONTROL_CAR
+    self.is_angle_control = self.CP.carFingerprint in ANGLE_CONTROL_CAR
     
     EsccCarController.update(self, CS)
     MadsCarController.update(self, self.CP, CC, CC_SP, self.frame)
@@ -226,7 +228,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # steering control
     can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, apply_steer_req, apply_steer, apply_torque, 
-                                                           self.lkas_icon, self.apply_angle_now, self.lkas_max_torque, is_angle_control))
+                                                           self.lkas_icon, self.apply_angle_now, self.lkas_max_torque, self.is_angle_control))
 
     # prevent LFA from activating on LKA steering cars by sending "no lane lines detected" to ADAS ECU
     if self.frame % 5 == 0 and lka_steering:
