@@ -86,7 +86,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # steering angle
     lkas_max_torque = 180
-    new_steer = int(round(actuators.steer * self.params.STEER_MAX))
+    new_steer = int(round(actuators.torque * self.params.STEER_MAX))
     apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.params)
     
     if self.CP.spFlags & HyundaiFlagsSP.SP_UPSTREAM_TACO.value:
