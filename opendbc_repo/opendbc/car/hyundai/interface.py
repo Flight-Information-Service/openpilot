@@ -2,7 +2,8 @@ from opendbc.car import Bus, get_safety_config, structs
 from opendbc.car.hyundai.hyundaicanfd import CanBus
 from opendbc.car.hyundai.values import HyundaiFlags, CAR, DBC, \
                                                    CANFD_UNSUPPORTED_LONGITUDINAL_CAR, \
-                                                   UNSUPPORTED_LONGITUDINAL_CAR, HyundaiSafetyFlags
+                                                   UNSUPPORTED_LONGITUDINAL_CAR, HyundaiSafetyFlags, \
+                                                   ANGLE_CONTROL_CAR
 from opendbc.car.hyundai.radar_interface import RADAR_START_ADDR
 from opendbc.car.interfaces import CarInterfaceBase
 from opendbc.car.disable_ecu import disable_ecu
@@ -21,6 +22,8 @@ Ecu = structs.CarParams.Ecu
 # Cancel button can sometimes be ACC pause/resume button, main button can also enable on some cars
 ENABLE_BUTTONS = (ButtonType.accelCruise, ButtonType.decelCruise, ButtonType.cancel, ButtonType.mainCruise)
 
+SteerControlType = car.CarParams.SteerControlType
+
 
 class CarInterface(CarInterfaceBase):
   CarState = CarState
@@ -34,6 +37,9 @@ class CarInterface(CarInterfaceBase):
     cam_can = CanBus(None, fingerprint).CAM
     lka_steering = 0x50 in fingerprint[cam_can] or 0x110 in fingerprint[cam_can]
     CAN = CanBus(None, fingerprint, lka_steering)
+
+    if candidate in ANGLE_CONTROL_CAR:
+      ret.steerControlType = SteerControlType.angle
 
     if ret.flags & HyundaiFlags.CANFD:
       # Shared configuration for CAN-FD cars
