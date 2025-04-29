@@ -71,14 +71,12 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     self.lkas_max_torque = 0
     self.driver_steering_angle_above_timer = 150
 
-    self.is_angle_control = False
+    self.is_angle_control = CP.carFingerprint in ANGLE_CONTROL_CAR
     
     self.steer_timer_apply_torque = 1.0
     self.DT_STEER = 0.005  # 0.01 1sec, 0.005  2sec
 
   def update(self, CC, CC_SP, CS, now_nanos):
-    self.is_angle_control = self.CP.carFingerprint in ANGLE_CONTROL_CAR
-    
     EsccCarController.update(self, CS)
     MadsCarController.update(self, self.CP, CC, CC_SP, self.frame)
     if self.frame % 2 == 0:
