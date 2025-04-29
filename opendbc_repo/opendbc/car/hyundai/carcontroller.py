@@ -63,7 +63,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     self.apply_angle_now = 0
     self.apply_angle_last = 0
-    self.apply_steer_last = 0
     self.max_steering_angle = 90
     self.max_driver_angle_wait = 0.002
     self.max_steer_angle_wait = 0.001
@@ -85,12 +84,28 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     actuators = CC.actuators
     hud_control = CC.hudControl
 
+    # steering torque
+    new_torque = int(round(actuators.torque * self.params.STEER_MAX))
+    apply_torque = apply_driver_steer_torque_limits(new_torque, self.apply_torque_last, CS.out.steeringTorque, self.params)
+
+    # >90 degree steering fault prevention
+    self.angle_limit_counter, apply_steer_req = common_fault_avoidance(abs(CS.out.steeringAngleDeg) >= MAX_ANGLE, CC.latActive,
+                                                                       self.angle_limit_counter, MAX_ANGLE_FRAMES,
+                                                                       MAX_ANGLE_CONSECUTIVE_FRAMES)
+
+    if not CC.latActive:
+      apply_torque = 0
+
+    # Hold torque with induced temporary fault when cutting the actuation bit
+    # FIXME: we don't use this with CAN FD?
+    torque_fault = CC.latActive and not apply_steer_req
+
+    self.apply_torque_last = apply_torque
+    
     # steering angle
     lkas_max_torque = 180
-    new_steer = int(round(actuators.torque * self.params.STEER_MAX))
-    apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.params)
 
-    self.apply_angle_now = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, apply_steer, CC.latActive, self.params)
+    self.apply_angle_now = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, apply_torque, CC.latActive, self.params)
     
     if abs(CS.out.steeringTorque) > lkas_max_torque:
       self.driver_steering_angle_above_timer -= 1
@@ -109,30 +124,10 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
       self.lkas_max_torque = lkas_max_torque * ego_weight
 
     if not CC.latActive:
-      apply_steer = 0
       self.apply_angle_now = 0
       self.lkas_max_torque = 0
 
     self.apply_angle_last = self.apply_angle_now
-    self.apply_steer_last = apply_steer
-
-    # steering torque
-    new_torque = int(round(actuators.torque * self.params.STEER_MAX))
-    apply_torque = apply_driver_steer_torque_limits(new_torque, self.apply_torque_last, CS.out.steeringTorque, self.params)
-
-    # >90 degree steering fault prevention
-    self.angle_limit_counter, apply_steer_req = common_fault_avoidance(abs(CS.out.steeringAngleDeg) >= MAX_ANGLE, CC.latActive,
-                                                                       self.angle_limit_counter, MAX_ANGLE_FRAMES,
-                                                                       MAX_ANGLE_CONSECUTIVE_FRAMES)
-
-    if not CC.latActive:
-      apply_torque = 0
-
-    # Hold torque with induced temporary fault when cutting the actuation bit
-    # FIXME: we don't use this with CAN FD?
-    torque_fault = CC.latActive and not apply_steer_req
-
-    self.apply_torque_last = apply_torque
 
     # accel + longitudinal
     accel = float(np.clip(actuators.accel, CarControllerParams.ACCEL_MIN, CarControllerParams.ACCEL_MAX))
@@ -158,7 +153,7 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     # *** CAN/CAN FD specific ***
     if self.CP.flags & HyundaiFlags.CANFD:
-      can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_steer, apply_torque, set_speed_in_units, 
+      can_sends.extend(self.create_canfd_msgs(apply_steer_req, apply_torque, set_speed_in_units, 
                                               accel, stopping, hud_control, CS, CC))
     else:
       can_sends.extend(self.create_can_msgs(apply_steer_req, apply_torque, torque_fault, set_speed_in_units, accel,
@@ -218,14 +213,14 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
 
     return can_sends
 
-  def create_canfd_msgs(self, apply_steer_req, apply_steer, apply_torque, set_speed_in_units, accel, stopping, hud_control, CS, CC):
+  def create_canfd_msgs(self, apply_steer_req, apply_torque, set_speed_in_units, accel, stopping, hud_control, CS, CC):
     can_sends = []
 
     lka_steering = self.CP.flags & HyundaiFlags.CANFD_LKA_STEERING
     lka_steering_long = lka_steering and self.CP.openpilotLongitudinalControl
 
     # steering control
-    can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, CC.latActive, apply_steer, apply_torque, 
+    can_sends.extend(hyundaicanfd.create_steering_messages(self.packer, self.CP, self.CAN, CC.enabled, CC.latActive, apply_torque, 
                                                            self.lkas_icon, self.lkas_max_torque, self.is_angle_control))
 
     # prevent LFA from activating on LKA steering cars by sending "no lane lines detected" to ADAS ECU
