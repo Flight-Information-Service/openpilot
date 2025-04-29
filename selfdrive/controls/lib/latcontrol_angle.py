@@ -22,6 +22,11 @@ class LatControlAngle(LatControl):
     self.steering_angle_deadzone_deg = self.torque_params.steeringAngleDeadzoneDeg
     self.extension = LatControlTorqueExt(self, CP, CP_SP)
 
+  def update_live_torque_params(self, latAccelFactor, latAccelOffset, friction):
+    self.torque_params.latAccelFactor = latAccelFactor
+    self.torque_params.latAccelOffset = latAccelOffset
+    self.torque_params.friction = friction
+
   def update(self, active, CS, VM, params, steer_limited_by_controls, desired_curvature, calibrated_pose, curvature_limited):
     angle_log = log.ControlsState.LateralAngleState.new_message()
 
