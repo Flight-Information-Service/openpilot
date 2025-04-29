@@ -10,6 +10,8 @@ class LatControlAngle(LatControl):
   def __init__(self, CP, CP_SP, CI):
     super().__init__(CP, CP_SP, CI)
     self.sat_check_min_speed = 5.
+    
+    self.extension = LatControlTorqueExt(self, CP, CP_SP)
 
   def update(self, active, CS, VM, params, steer_limited_by_controls, desired_curvature, calibrated_pose, curvature_limited):
     angle_log = log.ControlsState.LateralAngleState.new_message()
