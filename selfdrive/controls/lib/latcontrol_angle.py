@@ -3,6 +3,8 @@ import math
 from cereal import log
 from openpilot.selfdrive.controls.lib.latcontrol import LatControl
 
+from openpilot.sunnypilot.selfdrive.controls.lib.latcontrol_torque_ext import LatControlTorqueExt
+
 STEER_ANGLE_SATURATION_THRESHOLD = 2.5  # Degrees
 
 
