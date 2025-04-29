@@ -55,7 +55,7 @@ def create_steering_messages(packer, CP, CAN, enabled, lat_active, apply_angle, 
     common_values["LKA_AVAILABLE"] = 3 if lat_active else 0
     common_values["LKAS_ANGLE_CMD"] = -apply_angle
     common_values["LKAS_ANGLE_ACTIVE"] = 2 if lat_active else 1
-    common_values["LKA_ANGLE_MAX_TORQUE"] = max_torque if lat_active else 0
+    common_values["LKAS_ANGLE_MAX_TORQUE"] = max_torque if lat_active else 0
     common_values["NEW_SIGNAL_8"] = 10
     common_values["NEW_SIGNAL_3"] = 9
     common_values["NEW_SIGNAL_4"] = 1
