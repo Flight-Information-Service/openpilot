@@ -22,7 +22,7 @@ Ecu = structs.CarParams.Ecu
 # Cancel button can sometimes be ACC pause/resume button, main button can also enable on some cars
 ENABLE_BUTTONS = (ButtonType.accelCruise, ButtonType.decelCruise, ButtonType.cancel, ButtonType.mainCruise)
 
-SteerControlType = car.CarParams.SteerControlType
+SteerControlType = structs.CarParams.SteerControlType
 
 
 class CarInterface(CarInterfaceBase):
