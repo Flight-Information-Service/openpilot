@@ -90,9 +90,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     new_steer = int(round(actuators.torque * self.params.STEER_MAX))
     apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.params)
     
-    if self.CP.spFlags & HyundaiFlagsSP.SP_UPSTREAM_TACO.value:
-      apply_steer = clip(apply_steer, -self.params.STEER_MAX, self.params.STEER_MAX)
-    
     self.apply_angle_now = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw,
                                                self.params)
     
