@@ -126,6 +126,8 @@ class HyundaiFlags(IntFlag):
 
   ALT_LIMITS_2 = 2 ** 26
 
+  ANGLE_CONTROL = 2 ** 27
+
 
 class Footnote(Enum):
   CANFD = CarFootnote(
@@ -525,6 +527,21 @@ class CAR(Platforms):
     ],
     CarSpecs(mass=2055, wheelbase=2.9, steerRatio=16, tireStiffnessFactor=0.65),
     flags=HyundaiFlags.EV,
+  )
+  KIA_EV6_2025 = HyundaiCanFDPlatformConfig(
+    [
+      HyundaiCarDocs("Kia EV6 (with HDA I) 2025", "Highway Driving Assist II",
+                     car_parts=CarParts.common([CarHarness.hyundai_p]))
+    ],
+    CarSpecs(mass=2055, wheelbase=2.9, steerRatio=16, tireStiffnessFactor=0.65),
+    flags=HyundaiFlags.EV | HyundaiFlags.ANGLE_CONTROL,
+  )
+  KIA_EV9 = HyundaiCanFDPlatformConfig(
+    [
+      HyundaiCarDocs("Kia EV9", "All", car_parts=CarParts.common([CarHarness.hyundai_r]))
+    ],
+    CarSpecs(mass=2960, wheelbase=3.1, steerRatio=16.02),
+    flags=HyundaiFlags.EV | HyundaiFlags.ANGLE_CONTROL,
   )
   KIA_CARNIVAL_4TH_GEN = HyundaiCanFDPlatformConfig(
     [
