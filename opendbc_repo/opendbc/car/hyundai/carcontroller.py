@@ -89,9 +89,8 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     lkas_max_torque = 180
     new_steer = int(round(actuators.torque * self.params.STEER_MAX))
     apply_steer = apply_driver_steer_torque_limits(new_steer, self.apply_steer_last, CS.out.steeringTorque, self.params)
-    
-    self.apply_angle_now = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw,
-                                               self.params)
+
+    self.apply_angle_now = apply_std_steer_angle_limits(actuators.steeringAngleDeg, self.apply_angle_last, CS.out.vEgoRaw, apply_steer, CC.latActive, self.params)
     
     if abs(CS.out.steeringTorque) > lkas_max_torque:
       self.driver_steering_angle_above_timer -= 1
