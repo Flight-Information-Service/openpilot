@@ -76,9 +76,6 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     self.steer_timer_apply_torque = 1.0
     self.DT_STEER = 0.005  # 0.01 1sec, 0.005  2sec
 
-    if self.is_angle_control:
-      MAX_ANGLE = MAX_ANGLE_ON_ANGLE_CONTROL
-
   def update(self, CC, CC_SP, CS, now_nanos):
     EsccCarController.update(self, CS)
     MadsCarController.update(self, self.CP, CC, CC_SP, self.frame)
@@ -93,6 +90,9 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     apply_torque = apply_driver_steer_torque_limits(new_torque, self.apply_torque_last, CS.out.steeringTorque, self.params)
 
     # >90 degree steering fault prevention
+    if self.is_angle_control:
+      MAX_ANGLE = MAX_ANGLE_ON_ANGLE_CONTROL
+    
     self.angle_limit_counter, apply_steer_req = common_fault_avoidance(abs(CS.out.steeringAngleDeg) >= MAX_ANGLE, CC.latActive,
                                                                        self.angle_limit_counter, MAX_ANGLE_FRAMES,
                                                                        MAX_ANGLE_CONSECUTIVE_FRAMES)
