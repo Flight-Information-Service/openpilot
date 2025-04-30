@@ -17,6 +17,7 @@ LongCtrlState = structs.CarControl.Actuators.LongControlState
 # EPS faults if you apply torque while the steering angle is above 90 degrees for more than 1 second
 # All slightly below EPS thresholds to avoid fault
 MAX_ANGLE = 85
+MAX_ANGLE_ON_ANGLE_CONTROL = 190
 MAX_ANGLE_FRAMES = 89
 MAX_ANGLE_CONSECUTIVE_FRAMES = 2
 
@@ -74,6 +75,9 @@ class CarController(CarControllerBase, EsccCarController, LongitudinalController
     
     self.steer_timer_apply_torque = 1.0
     self.DT_STEER = 0.005  # 0.01 1sec, 0.005  2sec
+
+    if self.is_angle_control:
+      MAX_ANGLE = MAX_ANGLE_ON_ANGLE_CONTROL
 
   def update(self, CC, CC_SP, CS, now_nanos):
     EsccCarController.update(self, CS)
