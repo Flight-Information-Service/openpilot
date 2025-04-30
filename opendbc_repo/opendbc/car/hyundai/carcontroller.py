@@ -17,7 +17,7 @@ LongCtrlState = structs.CarControl.Actuators.LongControlState
 # EPS faults if you apply torque while the steering angle is above 90 degrees for more than 1 second
 # All slightly below EPS thresholds to avoid fault
 MAX_ANGLE = 85
-MAX_ANGLE_ON_ANGLE_CONTROL = 190
+MAX_ANGLE_ON_ANGLE_CONTROL = 270
 MAX_ANGLE_FRAMES = 89
 MAX_ANGLE_CONSECUTIVE_FRAMES = 2
 
