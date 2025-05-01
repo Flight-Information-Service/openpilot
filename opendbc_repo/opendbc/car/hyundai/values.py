@@ -45,25 +45,21 @@ class CarControllerParams:
                                CAR.HYUNDAI_IONIQ_EV_LTD, CAR.HYUNDAI_SANTA_FE_PHEV_2022, CAR.HYUNDAI_SONATA_LF, CAR.KIA_FORTE, CAR.KIA_NIRO_PHEV,
                                CAR.KIA_OPTIMA_H, CAR.KIA_OPTIMA_H_G4_FL, CAR.KIA_SORENTO):
       self.STEER_MAX = 255
-      self.STEER_ANGLE_MAX = 255
 
     # these cars have significantly more torque than most HKG; limit to 70% of max
     elif CP.flags & HyundaiFlags.ALT_LIMITS:
       self.STEER_MAX = 270
-      self.STEER_ANGLE_MAX = 270
       self.STEER_DELTA_UP = 2
       self.STEER_DELTA_DOWN = 3
 
     elif CP.flags & HyundaiFlags.ALT_LIMITS_2:
       self.STEER_MAX = 170
-      self.STEER_ANGLE_MAX = 170
       self.STEER_DELTA_UP = 2
       self.STEER_DELTA_DOWN = 3
 
     # Default for most HKG
     else:
       self.STEER_MAX = 384
-      self.STEER_ANGLE_MAX = 384
 
 
 class HyundaiSafetyFlags(IntFlag):
