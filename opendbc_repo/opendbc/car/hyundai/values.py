@@ -15,7 +15,7 @@ class CarControllerParams:
   ACCEL_MIN = -3.5 # m/s
   ACCEL_MAX = 2.0 # m/s
 
-  STEER_ANGLE_MAX = 85
+  STEER_MAX = 85
 
   # seen changing at 0.2 deg/frame down, 0.1 deg/frame up at 100Hz
   ANGLE_RATE_LIMIT_UP = AngleRateLimit(speed_bp=[0., 5., 15.], angle_v=[5., .8, .15])
