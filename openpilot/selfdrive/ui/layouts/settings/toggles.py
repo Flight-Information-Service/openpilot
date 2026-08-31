@@ -8,6 +8,7 @@ from openpilot.system.ui.lib.application import gui_app
 from openpilot.system.ui.lib.multilang import tr, tr_noop
 from openpilot.system.ui.widgets import DialogResult
 from openpilot.selfdrive.ui.ui_state import ui_state
+from openpilot.selfdrive.ui.layouts.settings.common import get_bool_safe, param_known
 
 if gui_app.sunnypilot_ui():
   from openpilot.system.ui.sunnypilot.widgets.list_view import toggle_item_sp as toggle_item
@@ -32,10 +33,18 @@ DESCRIPTIONS = {
     "without a turn signal activated while driving over 31 mph (50 km/h)."
   ),
   "AlwaysOnDM": tr_noop("Enable driver monitoring even when sunnypilot is not engaged."),
+  "DisableDriverMonitoring": tr_noop(
+    "Stop the driver monitoring camera from watching your attention. sunnypilot will no longer warn you or force a disengagement "
+    "when you look away from the road or fall asleep, and nothing will stop the car from continuing on its own. "
+    "You remain fully responsible for watching the road and for the vehicle at all times."
+  ),
   'RecordFront': tr_noop("Upload data from the driver facing camera and help improve the driver monitoring algorithm."),
   "IsMetric": tr_noop("Display speed in km/h instead of mph."),
   "RecordAudio": tr_noop("Record and store microphone audio while driving. The audio will be included in the dashcam video in comma connect."),
 }
+
+# unsafe to flip mid-drive, only settable while disengaged
+OFFROAD_ONLY_TOGGLES = {"DisableDriverMonitoring"}
 
 
 class TogglesLayout(Widget):
@@ -76,6 +85,12 @@ class TogglesLayout(Widget):
         "monitoring.png",
         False,
       ),
+      "DisableDriverMonitoring": (
+        lambda: tr("Disable Driver Monitoring"),
+        DESCRIPTIONS["DisableDriverMonitoring"],
+        "monitoring.png",
+        False,
+      ),
       "RecordFront": (
         lambda: tr("Record and Upload Driver Camera"),
         DESCRIPTIONS["RecordFront"],
@@ -112,7 +127,7 @@ class TogglesLayout(Widget):
       toggle = toggle_item(
         title,
         desc,
-        self._params.get_bool(param),
+        get_bool_safe(self._params, param),
         callback=lambda state, p=param: self._toggle_callback(state, p),
         icon=icon,
       )
@@ -121,6 +136,8 @@ class TogglesLayout(Widget):
         locked = self._params.get_bool(param + "Lock")
       except UnknownKeyName:
         locked = False
+      # an unknown key can't be written either, so grey it out instead of crashing on tap
+      locked = locked or not param_known(self._params, param)
       toggle.action_item.set_enabled(not locked)
 
       # Make description callable for live translation
@@ -202,11 +219,15 @@ class TogglesLayout(Widget):
     # TODO: make a param control list item so we don't need to manage internal state as much here
     # refresh toggles from params to mirror external changes
     for param in self._toggle_defs:
-      self._toggles[param].action_item.set_state(self._params.get_bool(param))
+      self._toggles[param].action_item.set_state(get_bool_safe(self._params, param))
 
-    # these toggles need restart, block while engaged
+    # always-on driver monitoring has no effect while monitoring is off
+    if "AlwaysOnDM" not in self._locked_toggles:
+      self._toggles["AlwaysOnDM"].action_item.set_enabled(not get_bool_safe(self._params, "DisableDriverMonitoring"))
+
+    # these toggles need restart or are unsafe to change mid-drive, block while engaged
     for toggle_def in self._toggle_defs:
-      if self._toggle_defs[toggle_def][3] and toggle_def not in self._locked_toggles:
+      if (self._toggle_defs[toggle_def][3] or toggle_def in OFFROAD_ONLY_TOGGLES) and toggle_def not in self._locked_toggles:
         self._toggles[toggle_def].action_item.set_enabled(not ui_state.engaged)
 
   def _render(self, rect):
@@ -236,12 +257,30 @@ class TogglesLayout(Widget):
       self._update_experimental_mode_icon()
       self._params.put_bool("ExperimentalMode", state, block=True)
 
+  def _handle_disable_dm_toggle(self):
+    def confirm_callback(result: DialogResult):
+      if result == DialogResult.CONFIRM:
+        self._params.put_bool("DisableDriverMonitoring", True, block=True)
+      else:
+        self._toggles["DisableDriverMonitoring"].action_item.set_state(False)
+      self._update_toggles()
+
+    content = (f"<h1>{self._toggles['DisableDriverMonitoring'].title}</h1><br>" +
+               f"<p>{self._toggles['DisableDriverMonitoring'].description}</p>")
+    gui_app.push_widget(ConfirmDialog(content, tr("Disable"), rich=True, callback=confirm_callback))
+
   def _toggle_callback(self, state: bool, param: str):
     if param == "ExperimentalMode":
       self._handle_experimental_mode_toggle(state)
       return
 
+    if param == "DisableDriverMonitoring" and state:
+      self._handle_disable_dm_toggle()
+      return
+
     self._params.put_bool(param, state, block=True)
+    if param == "DisableDriverMonitoring":
+      self._update_toggles()
     if self._toggle_defs[param][3]:
       self._params.put_bool("OnroadCycleRequested", True, block=True)
 
