@@ -6,10 +6,11 @@ See the LICENSE.md file in the root directory for more details.
 """
 from openpilot.selfdrive.ui.mici.layouts.home import MiciHomeLayout
 from openpilot.system.ui.lib.application import FontWeight
+from openpilot.system.ui.lib.multilang import tr
 from openpilot.system.ui.widgets.label import UnifiedLabel
 
 
 class MiciHomeLayoutSP(MiciHomeLayout):
   def __init__(self):
     super().__init__()
-    self._openpilot_label = UnifiedLabel("ChadolePilot", font_size=72, font_weight=FontWeight.AUDIOWIDE, max_width=480, wrap_text=False)
+    self._openpilot_label = UnifiedLabel(lambda: tr("ChadolPilot"), font_size=72, font_weight=FontWeight.AUDIOWIDE, max_width=480, wrap_text=False)

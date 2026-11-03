@@ -49,7 +49,7 @@ class DisableDriverMonitoringConfirmPage(NavScroller):
       GreyBigButton("disabling\ndriver monitoring", "scroll to continue",
                     gui_app.texture("icons_mici/setup/warning.png", 64, 64)),
       GreyBigButton("", "The cabin camera will stop watching your attention."),
-      GreyBigButton("", "ChadolePilot will no longer warn you or force a disengagement when you look away from the road or fall asleep."),
+      GreyBigButton("", "ChadolPilot will no longer warn you or force a disengagement when you look away from the road or fall asleep."),
       GreyBigButton("", "Nothing will stop the car from continuing on its own."),
       GreyBigButton("", "You remain fully responsible for watching the road and for the vehicle at all times."),
       accept,
@@ -71,7 +71,7 @@ class TogglesLayoutMici(NavScroller):
                                      toggle_callback=self._on_disable_dm)
     record_front = BigParamControl("record & upload cabin camera", "RecordFront", toggle_callback=restart_needed_callback)
     record_mic = BigParamControl("record & upload mic audio", "RecordAudio", toggle_callback=restart_needed_callback)
-    enable_openpilot = BigParamControl("enable ChadolePilot", "OpenpilotEnabledToggle", toggle_callback=restart_needed_callback)
+    enable_openpilot = BigParamControl("enable ChadolPilot", "OpenpilotEnabledToggle", toggle_callback=restart_needed_callback)
 
     self._scroller.add_widgets([
       self._personality_toggle,

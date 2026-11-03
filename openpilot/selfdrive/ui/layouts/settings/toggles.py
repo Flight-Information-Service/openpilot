@@ -19,22 +19,22 @@ PERSONALITY_TO_INT = log.LongitudinalPersonality.schema.enumerants
 # Description constants
 DESCRIPTIONS = {
   "OpenpilotEnabledToggle": tr_noop(
-    "Use the ChadolePilot system for adaptive cruise control and lane keep driver assistance. " +
+    "Use the ChadolPilot system for adaptive cruise control and lane keep driver assistance. " +
     "Your attention is required at all times to use this feature."
   ),
-  "DisengageOnAccelerator": tr_noop("When enabled, pressing the accelerator pedal will disengage ChadolePilot."),
+  "DisengageOnAccelerator": tr_noop("When enabled, pressing the accelerator pedal will disengage ChadolPilot."),
   "LongitudinalPersonality": tr_noop(
-    "Standard is recommended. In aggressive mode, ChadolePilot will follow lead cars closer and be more aggressive with the gas and brake. " +
-    "In relaxed mode ChadolePilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with " +
+    "Standard is recommended. In aggressive mode, ChadolPilot will follow lead cars closer and be more aggressive with the gas and brake. " +
+    "In relaxed mode ChadolPilot will stay further away from lead cars. On supported cars, you can cycle through these personalities with " +
     "your steering wheel distance button."
   ),
   "IsLdwEnabled": tr_noop(
     "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line " +
     "without a turn signal activated while driving over 31 mph (50 km/h)."
   ),
-  "AlwaysOnDM": tr_noop("Enable driver monitoring even when ChadolePilot is not engaged."),
+  "AlwaysOnDM": tr_noop("Enable driver monitoring even when ChadolPilot is not engaged."),
   "DisableDriverMonitoring": tr_noop(
-    "Stop the driver monitoring camera from watching your attention. ChadolePilot will no longer warn you or force a disengagement "
+    "Stop the driver monitoring camera from watching your attention. ChadolPilot will no longer warn you or force a disengagement "
     "when you look away from the road or fall asleep, and nothing will stop the car from continuing on its own. "
     "You remain fully responsible for watching the road and for the vehicle at all times."
   ),
@@ -56,7 +56,7 @@ class TogglesLayout(Widget):
     # param, title, desc, icon, needs_restart
     self._toggle_defs = {
       "OpenpilotEnabledToggle": (
-        lambda: tr("Enable ChadolePilot"),
+        lambda: tr("Enable ChadolPilot"),
         DESCRIPTIONS["OpenpilotEnabledToggle"],
         "chffr_wheel.png",
         True,
@@ -143,7 +143,7 @@ class TogglesLayout(Widget):
       # Make description callable for live translation
       additional_desc = ""
       if needs_restart and not locked:
-        additional_desc = tr("Changing this setting will restart ChadolePilot if the car is powered on.")
+        additional_desc = tr("Changing this setting will restart ChadolPilot if the car is powered on.")
       toggle.set_description(lambda og_desc=toggle.description, add_desc=additional_desc: tr(og_desc) + (" " + tr(add_desc) if add_desc else ""))
 
       # track for engaged state updates
@@ -177,10 +177,10 @@ class TogglesLayout(Widget):
     ui_state.update_params()
 
     e2e_description = tr(
-      "ChadolePilot defaults to driving in chill mode. Experimental mode enables alpha-level features that aren't ready for chill mode. " +
+      "ChadolPilot defaults to driving in chill mode. Experimental mode enables alpha-level features that aren't ready for chill mode. " +
       "Experimental features are listed below:<br>" +
       "<h4>End-to-End Longitudinal Control</h4><br>" +
-      "Let the driving model control the gas and brakes. ChadolePilot will drive as it thinks a human would, including stopping for red lights and stop signs. " +
+      "Let the driving model control the gas and brakes. ChadolPilot will drive as it thinks a human would, including stopping for red lights and stop signs. " +
       "Since the driving model decides the speed to drive, the set speed will only act as an upper bound. This is an alpha quality feature; " +
       "mistakes should be expected.<br>" +
       "<h4>New Driving Visualization</h4><br>" +
@@ -202,13 +202,13 @@ class TogglesLayout(Widget):
 
         unavailable = tr("Experimental mode is currently unavailable on this car since the car's stock ACC is used for longitudinal control.")
 
-        long_desc = unavailable + " " + tr("ChadolePilot longitudinal control may come in a future update.")
+        long_desc = unavailable + " " + tr("ChadolPilot longitudinal control may come in a future update.")
         if ui_state.CP.alphaLongitudinalAvailable:
           if self._is_release:
-            long_desc = unavailable + " " + tr("An alpha version of ChadolePilot longitudinal control can be tested, along with " +
+            long_desc = unavailable + " " + tr("An alpha version of ChadolPilot longitudinal control can be tested, along with " +
                                                "Experimental mode, on non-release branches.")
           else:
-            long_desc = tr("Enable the ChadolePilot longitudinal control (alpha) toggle to allow Experimental mode.")
+            long_desc = tr("Enable the ChadolPilot longitudinal control (alpha) toggle to allow Experimental mode.")
 
         self._toggles["ExperimentalMode"].set_description("<b>" + long_desc + "</b><br><br>" + e2e_description)
     else:
